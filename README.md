@@ -17,6 +17,8 @@
 | **編碼器** | **EC11 旋鈕** | D 型半軸 / 柄長 15mm / 帶開關 | 30 脈衝版本 |
 | **旋鈕帽** | **大型全鋁** | 35×16mm 黑色滾花噴砂 | 直徑 35mm |
 | **線材** | **30 AWG 矽膠線** | 超軟、多色套裝 | 內部焊接理線專用 |
+| **螺絲** | **M2 × 6mm 平頭螺絲** | 平頭（沉頭）/ 不鏽鋼或黑色 | 上下蓋固定用 |
+| **止滑貼片** | **自黏橡膠腳墊 × 6** | 圓形或方形均可 | 底部墊高及止滑 |
 
 ---
 
@@ -266,6 +268,55 @@ claude_microPad/
 └── hooks/
     └── led_hook.py                    # Claude Code Hook 腳本（設定 COM port）
 ```
+
+---
+
+---
+
+## 🤖 九、 自訂 Slash Command — `/gitPush`
+
+本專案內建一個自訂 Claude Code 指令 `/gitPush`，對應鍵盤上的 **[4]** 號按鍵。
+
+### 功能說明
+
+按下按鍵後，Claude Code 會自動：
+
+1. 收集所有未提交的 git 變更（`git status`、`git diff`、`git log`）
+2. 產出一份**繁體中文**的變更摘要，並建議英文 commit 訊息
+3. 顯示目前 git 帳號，**等待用戶確認**後才執行寫入
+4. 逐一 `git add` 相關檔案 → `git commit` → `git push origin main`
+5. 回報最新 commit hash
+
+> 收到確認之前，不會執行任何 git 寫入操作。
+
+### 指令檔案位置
+
+```
+.claude/commands/gitPush.md   ← 本專案專屬（僅此專案有效）
+```
+
+### 改為全域使用（所有專案都能用）
+
+Claude Code 的 Slash Command 有兩個存放位置：
+
+| 位置 | 路徑 | 有效範圍 |
+| :--- | :--- | :--- |
+| **專案層級** | `<專案目錄>/.claude/commands/` | 僅限該專案 |
+| **全域層級** | `~/.claude/commands/` | 所有專案 |
+
+將指令升級為全域只需複製檔案：
+
+**Windows（PowerShell）**
+```powershell
+Copy-Item "d:\projects\claude_microPad\.claude\commands\gitPush.md" "$env:USERPROFILE\.claude\commands\gitPush.md"
+```
+
+**macOS / Linux（Bash）**
+```bash
+cp /path/to/claude_microPad/.claude/commands/gitPush.md ~/.claude/commands/gitPush.md
+```
+
+複製完成後，在任何專案的 Claude Code 中輸入 `/gitPush` 或按下鍵盤 [4] 號鍵，即可使用。
 
 ---
 
