@@ -274,21 +274,73 @@ claude_microPad/
 
 ---
 
-## 🤖 九、 自訂 Slash Command — `/gitPush`
+## 🤖 九、 自訂 Slash Command — `/gitCommit`
 
-本專案內建一個自訂 Claude Code 指令 `/gitPush`，對應鍵盤上的 **[4]** 號按鍵。
+本專案內建自訂 Claude Code 指令 `/gitCommit`，對應鍵盤上的 **[4]** 號按鍵。
 
 ### 功能說明
 
 按下按鍵後，Claude Code 會自動：
 
-1. 收集所有未提交的 git 變更（`git status`、`git diff`、`git log`）
-2. 產出一份**繁體中文**的變更摘要，並建議英文 commit 訊息
-3. 顯示目前 git 帳號，**等待用戶確認**後才執行寫入
-4. 逐一 `git add` 相關檔案 → `git commit` → `git push origin main`
+1. **平行**收集 `git status`、`git diff HEAD`、`git log --oneline -5`、`git stash list`
+2. 產出一份**繁體中文**的變更摘要（每個檔案說明改了什麼、為什麼），並建議符合此 repo 慣例的英文 commit 訊息
+3. 顯示目前 git 帳號與分支，**等待用戶確認**後才執行寫入
+4. 逐一 `git add` 相關檔案（避免加入敏感檔），再以 HEREDOC 執行 `git commit`
 5. 回報最新 commit hash
 
 > 收到確認之前，不會執行任何 git 寫入操作。
+
+**例外處理：**
+- 無變更 → 告知工作目錄乾淨
+- 偵測到 `.env`、`*secret*` 等敏感檔 → 警告並略過
+- pre-commit hook 失敗 → **不使用 `--amend`**，修正後建立全新 commit
+- 殘留 Merge conflict 標記 → 中斷並警告
+
+### 指令檔案位置
+
+```
+.claude/commands/gitCommit.md   ← 本專案專屬（僅此專案有效）
+```
+
+---
+
+## 🤖 十、 自訂 Slash Command — `/gitPush`
+
+本專案內建自訂 Claude Code 指令 `/gitPush`，對應鍵盤上的 **[9]** 號按鍵（旋鈕按下）。
+
+### 功能說明
+
+`/gitPush` 專責將已 commit 的變更推送至遠端，執行流程如下：
+
+**第一階段：預檢**
+- 若工作區有未提交的變更，**立即中斷**並提示先完成 commit 或 `git stash`
+- 若分支尚無遠端追蹤（首次推送），跳至「首次推送流程」
+
+**第二階段：狀態彙整**
+- 顯示目前 git 帳號、分支，以及所有待推送的 commit 清單
+- 若目前分支為 `main` / `master`，額外顯示保護分支警告
+
+**第三階段：合併策略**
+
+列出待推送 commit 後，提供三個選項：
+
+| 選項 | 說明 |
+| :--- | :--- |
+| **1. 合併推送（預設）** | Squash 成單一 commit，自動建立備份分支 `backup/<branch>-<YYYYMMDD>` |
+| **2. 編輯訊息後合併推送** | 同上，但允許手動修改 commit 訊息 |
+| **3. 原樣推送** | 直接 `git push`，保留所有 commit |
+
+> 若只有 1 個待推送 commit，跳過合併選項，直接確認推送。
+
+**第四階段：執行**
+- 合併推送：`git reset --soft <基準點>` → `git commit` → `git push`
+- 原樣推送：直接 `git push`
+- 推送失敗時，告知可用備份分支復原
+
+**首次推送流程（NO_UPSTREAM）：**
+確認後執行 `git push -u origin <branch>`，不執行 Squash。
+
+> 收到確認之前，不會執行任何 git 寫入操作。永遠不使用 `--no-verify` 或 `--force`。
 
 ### 指令檔案位置
 
@@ -309,15 +361,17 @@ Claude Code 的 Slash Command 有兩個存放位置：
 
 **Windows（PowerShell）**
 ```powershell
+Copy-Item "d:\projects\claude_microPad\.claude\commands\gitCommit.md" "$env:USERPROFILE\.claude\commands\gitCommit.md"
 Copy-Item "d:\projects\claude_microPad\.claude\commands\gitPush.md" "$env:USERPROFILE\.claude\commands\gitPush.md"
 ```
 
 **macOS / Linux（Bash）**
 ```bash
+cp /path/to/claude_microPad/.claude/commands/gitCommit.md ~/.claude/commands/gitCommit.md
 cp /path/to/claude_microPad/.claude/commands/gitPush.md ~/.claude/commands/gitPush.md
 ```
 
-複製完成後，在任何專案的 Claude Code 中輸入 `/gitPush` 或按下鍵盤 [4] 號鍵，即可使用。
+複製完成後，在任何專案的 Claude Code 中輸入 `/gitCommit` 或 `/gitPush`，即可使用。
 
 ---
 
