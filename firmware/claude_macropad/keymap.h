@@ -78,27 +78,27 @@
 //     中文輸入法使用者建議用 "\n\n"，因為輸入法會吃掉一個 \n
 
 const char* BTN_MACROS[10] = {
-  "",               // [0] ↓ 使用 BTN_KEYS
-  "",               // [1] ↓ 使用 BTN_KEYS
+  "/clear\n\n",     // [0] /clear（清除對話）
+  "/compact\n\n",   // [1] /compact（整理對話）
   "",               // [2] ↓ 使用 BTN_KEYS
   "",               // [3] ↓ 使用 BTN_KEYS
-  "/gitCommit\n\n", // [4] /gitCommit（提交 Git）
-  "/clear\n\n",     // [5] /clear（清除對話）
-  "/compact\n\n",   // [6] /compact（整理對話）
+  "/gitPush\n\n",   // [4] /gitPush（推送 Git）
+  "/gitCommit\n\n", // [5] /gitCommit（提交 Git）
+  "",               // [6] ↓ 使用 BTN_KEYS
   "allow\n\n",      // [7] allow（允許操作）
   "",               // [8] ↓ 使用 BTN_KEYS
-  "/gitPush\n\n",   // [9] /gitPush（推送 Git）
+  "",               // [9] ↓ 使用 BTN_KEYS
 };
 
 const uint8_t BTN_KEYS[10][3] = {
-  {SLASH, 0,       0},  // [0] /
-  {SHIFT, TAB,     0},  // [1] Shift+Tab
+  {0,     0,       0},  // [0] （巨集優先，此鍵不作用）
+  {0,     0,       0},  // [1] （巨集優先，此鍵不作用）
   {WIN,   TAB,     0},  // [2] WIN+Tab
   {ENTER, 0,       0},  // [3] Enter（送出）
   {0,     0,       0},  // [4] （巨集優先，此鍵不作用）
   {0,     0,       0},  // [5] （巨集優先，此鍵不作用）
-  {0,     0,       0},  // [6] （巨集優先，此鍵不作用）
+  {SHIFT, TAB,     0},  // [6] Shift+Tab（切換權限模式）
   {0,     0,       0},  // [7] （巨集優先，此鍵不作用）
   {ESC,   0,       0},  // [8] ESC
-  {0,     0,       0},  // [9] 旋鈕按下（巨集優先，此鍵不作用）
+  {ENTER, 0,       0},  // [9] 旋鈕按下（Enter）
 };

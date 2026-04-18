@@ -19,10 +19,10 @@ This is a **hardware design project** for the "Claude Ghost Macro Pad" (V2.0 Rel
 
 **Key Layout (all 1U keycaps):**
 - Top-left standalone: `ESC` (ESC)
-- Top-right standalone: `Knob / gitPush` (rotary encoder — scroll or press to run /gitPush)
+- Top-right standalone: `Knob / Enter` (rotary encoder — scroll or press to send Enter)
 - Central 2×4 matrix:
-  - Upper row: `/` (Slash Command) | `Change Permission Mode` (Shift+Tab) | `Switch Window` (Win+Tab) | `Enter`
-  - Lower row: `Git Commit` (/gitCommit + Enter) | `Clear` (/clear + Enter) | `Compact` (/compact + Enter) | `Allow` (allow + Enter)
+  - Upper row: `Clear` (/clear + Enter) | `Compact` (/compact + Enter) | `Switch Window` (Win+Tab) | `Enter`
+  - Lower row: `Git Push` (/gitPush + Enter) | `Git Commit` (/gitCommit + Enter) | `Change Permission Mode` (Shift+Tab) | `Allow` (allow + Enter)
 
 **LED (RGB, common-anode):** Longest pin → 3.3V; R/G/B pins each through 220Ω resistor to GPIO. Logic: `False` (LOW) = on, `True` (HIGH) = off.
 

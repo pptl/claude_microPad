@@ -37,14 +37,14 @@
 | 索引 | 位置 | 功能 | 輸出 |
 | :--- | :--- | :--- | :--- |
 | **[8]** | 左上角獨立鍵 | ESC | ESC |
-| **[9]** | 右上角旋鈕按下 | Git Push | `/gitPush` + Enter |
-| **[0]** | 矩陣上排 1 | Slash Command | `/` |
-| **[1]** | 矩陣上排 2 | Change Permission Mode | Shift+Tab |
+| **[9]** | 右上角旋鈕按下 | Enter | Enter |
+| **[0]** | 矩陣上排 1 | Clear 對話 | `/clear` + Enter |
+| **[1]** | 矩陣上排 2 | Compact 對話 | `/compact` + Enter |
 | **[2]** | 矩陣上排 3 | Switch Window | Win+Tab |
 | **[3]** | 矩陣上排 4 | Enter | Enter |
-| **[4]** | 矩陣下排 1 | Git Commit | `/gitCommit` + Enter |
-| **[5]** | 矩陣下排 2 | Clear 對話 | `/clear` + Enter |
-| **[6]** | 矩陣下排 3 | Compact 對話 | `/compact` + Enter |
+| **[4]** | 矩陣下排 1 | Git Push | `/gitPush` + Enter |
+| **[5]** | 矩陣下排 2 | Git Commit | `/gitCommit` + Enter |
+| **[6]** | 矩陣下排 3 | Change Permission Mode | Shift+Tab |
 | **[7]** | 矩陣下排 4 | Allow | `allow` + Enter |
 | — | 旋鈕旋轉 | 捲動 | ↑ / ↓ |
 
@@ -228,11 +228,13 @@ const uint8_t BTN_KEYS[10][3] = {
 
 ```c
 const char* BTN_MACROS[10] = {
-  "",               // [0] 空字串 → 使用 BTN_KEYS
-  "",               // [1] 空字串 → 使用 BTN_KEYS
-  "/gitCommit\n\n", // [4] 輸出 /gitCommit 後按兩次 Enter
-  "/clear\n\n",     // [5] 輸出 /clear 後按兩次 Enter
-  "/gitPush\n\n",   // [9] 輸出 /gitPush 後按兩次 Enter（旋鈕）
+  "/clear\n\n",     // [0] 輸出 /clear 後按兩次 Enter
+  "/compact\n\n",   // [1] 輸出 /compact 後按兩次 Enter
+  "",               // [2] 空字串 → 使用 BTN_KEYS
+  "",               // [3] 空字串 → 使用 BTN_KEYS
+  "/gitPush\n\n",   // [4] 輸出 /gitPush 後按兩次 Enter
+  "/gitCommit\n\n", // [5] 輸出 /gitCommit 後按兩次 Enter
+  "",               // [9] 空字串 → 使用 BTN_KEYS（旋鈕按下 = Enter）
   ...
 };
 ```
@@ -301,7 +303,7 @@ claude_microPad/
 
 ## 🤖 九、 自訂 Slash Command — `/gitCommit`
 
-本專案內建自訂 Claude Code 指令 `/gitCommit`，對應鍵盤上的 **[4]** 號按鍵。
+本專案內建自訂 Claude Code 指令 `/gitCommit`，對應鍵盤上的 **[5]** 號按鍵。
 
 ### 功能說明
 
