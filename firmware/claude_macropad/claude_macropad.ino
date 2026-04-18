@@ -4,19 +4,9 @@
 */
 
 #include <Adafruit_TinyUSB.h>
+#include "keymap.h"
 
-// --- 1. 橋接按鍵定義 (將舊代碼轉向 TinyUSB) ---
-#define KEY_LEFT_CTRL   HID_KEY_CONTROL_LEFT
-#define KEY_LEFT_SHIFT  HID_KEY_SHIFT_LEFT
-#define KEY_LEFT_GUI    HID_KEY_GUI_LEFT
-#define KEY_LEFT_ALT    HID_KEY_ALT_LEFT
-#define KEY_UP_ARROW    HID_KEY_ARROW_UP
-#define KEY_DOWN_ARROW  HID_KEY_ARROW_DOWN
-#define KEY_RETURN      HID_KEY_RETURN
-#define KEY_ESC         HID_KEY_ESCAPE
-#define KEY_TAB         HID_KEY_TAB
-
-// --- 2. 手動建立 Keyboard 模擬物件 ---
+// --- 1. 手動建立 Keyboard 模擬物件 ---
 uint8_t const desc_hid_report[] = { TUD_HID_REPORT_DESC_KEYBOARD() };
 Adafruit_USBD_HID usb_hid;
 
@@ -30,6 +20,7 @@ public:
 
   // 一次送出最多 3 個按鍵的完整組合報告（同時處理 modifier + 一般鍵）
   void sendCombo(const uint8_t keys[3]) {
+    if (!usb_hid.ready()) return;
     uint8_t mod = 0;
     uint8_t keycodes[6] = {0};
     int ki = 0;
@@ -44,27 +35,46 @@ public:
     usb_hid.keyboardReport(0, mod, keycodes);
   }
 
-  void releaseAll() { usb_hid.keyboardRelease(0); }
+  // 等待 USB 端點就緒後再送釋放報告，確保主機能收到 key-up
+  void releaseAll() {
+    unsigned long t = millis();
+    while (!usb_hid.ready() && (millis() - t) < 20) delay(1);
+    usb_hid.keyboardRelease(0);
+  }
+
+  // 逐字輸出字串（支援 a-z A-Z 0-9 / space \n -）
+  void typeString(const char* str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+      uint8_t key = 0, mod = 0;
+      char c = str[i];
+      if      (c >= 'a' && c <= 'z') { key = HID_KEY_A + (c - 'a'); }
+      else if (c >= 'A' && c <= 'Z') { key = HID_KEY_A + (c - 'A'); mod = 0x02; }
+      else if (c >= '1' && c <= '9') { key = HID_KEY_1 + (c - '1'); }
+      else if (c == '0')  { key = HID_KEY_0;      }
+      else if (c == '\n') { delay(200); key = 0x28; }
+      else if (c == ' ')  { key = HID_KEY_SPACE;   }
+      else if (c == '/')  { key = HID_KEY_SLASH;   }
+      else if (c == '-')  { key = HID_KEY_MINUS;   }
+      if (key == 0) continue;
+      unsigned long t = millis();
+      while (!usb_hid.ready() && (millis() - t) < 100) delay(1);
+      uint8_t keys[6] = {key, 0, 0, 0, 0, 0};
+      if (!usb_hid.keyboardReport(0, mod, keys)) {
+        delay(20);
+        usb_hid.keyboardReport(0, mod, keys);
+      }
+      delay(30);
+      releaseAll();
+      delay(30);
+    }
+  }
 } Keyboard;
 
 // --- 3. 硬體腳位定義 ---
-const int LED_PINS[6] = {12, 13, 14, 16, 17, 18}; // R1 G1 B1 R2 G2 B2
-const int BTN_PINS[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-const int ENC_CLK = 10;
-const int ENC_DT  = 11;
-
-const uint8_t BTN_KEYS[10][3] = {
-  {KEY_LEFT_CTRL,  'c',           0}, // GP0: Ctrl+C
-  {KEY_LEFT_SHIFT, KEY_TAB,       0}, // GP1: Shift+Tab
-  {KEY_LEFT_CTRL,  'e',           0}, // GP2: Ctrl+E
-  {KEY_UP_ARROW,   0,             0}, // GP3: Up
-  {KEY_RETURN,     0,             0}, // GP4: Enter
-  {KEY_LEFT_CTRL,  't',           0}, // GP5: Ctrl+T
-  {HID_KEY_SLASH,  0,             0}, // GP6: /
-  {KEY_DOWN_ARROW, 0,             0}, // GP7: Down
-  {KEY_LEFT_GUI,   KEY_TAB,       0}, // GP8: Win+Tab
-  {KEY_ESC,        0,             0}  // GP9: ESC
-};
+const int LED_PINS[6] = {2, 3, 4, 28, 27, 26}; // R1 G1 B1 R2 G2 B2
+const int BTN_PINS[10] = {6, 7, 16, 17, 8, 9, 19, 18, 0, 22};
+const int ENC_CLK = 20;
+const int ENC_DT  = 21;
 
 // --- 4. Debounce 狀態 ---
 const unsigned long DEBOUNCE_MS = 20;
@@ -73,10 +83,23 @@ bool rawBtn[10];       // 目前讀到的原始電位
 bool stableBtn[10];    // 經過 debounce 後的穩定狀態
 unsigned long debounceTimer[10];
 
-// 旋鈕 debounce
-bool lastClk;
-unsigned long encTimer = 0;
-const unsigned long ENC_DEBOUNCE_MS = 5;
+// 旋鈕 - 正交狀態機 + 穩定時間 debounce
+// 新狀態必須保持穩定 ENC_STABLE_MS 毫秒才算有效轉換，防止彈跳累積
+uint8_t encState   = 0;  // 最後確認的穩定狀態
+uint8_t encPending = 0;  // 目前讀到、尚待確認的狀態
+int8_t  encCount   = 0;
+unsigned long encStableTimer = 0;
+const unsigned long ENC_STABLE_MS  = 5;  // 信號穩定門檻（毫秒）
+const int8_t        STEPS_PER_DETENT = 4; // EC11 標準值；若一格觸發兩次改成 2
+
+// 正交解碼表：ENC_TABLE[舊狀態][新狀態] = +1 (CW) / -1 (CCW) / 0 (無效跳變)
+const int8_t ENC_TABLE[4][4] = {
+//  新: 00  01  10  11
+    {  0, +1, -1,  0 }, // 舊 00
+    { -1,  0,  0, +1 }, // 舊 01
+    { +1,  0,  0, -1 }, // 舊 10
+    {  0, -1, +1,  0 }, // 舊 11
+};
 
 // --- 5. LED ---
 void setLeds(bool r1, bool g1, bool b1, bool r2, bool g2, bool b2) {
@@ -106,15 +129,19 @@ void setup() {
 
   pinMode(ENC_CLK, INPUT_PULLUP);
   pinMode(ENC_DT,  INPUT_PULLUP);
-  lastClk = digitalRead(ENC_CLK);
+  encState = encPending = (digitalRead(ENC_CLK) << 1) | digitalRead(ENC_DT);
 
   Keyboard.begin();
   Serial.begin(9600);
 
-  // 啟動成功的視覺反饋：閃爍三次藍燈
+  // 等待 USB 枚舉完成（最多 2 秒），確保動畫在 USB 穩定後執行
+  unsigned long t0 = millis();
+  while (!TinyUSBDevice.mounted() && (millis() - t0 < 2000)) delay(1);
+
+  // 啟動成功的視覺反饋：閃爍三次藍燈（250ms 週期，肉眼清晰可見）
   for (int i = 0; i < 3; i++) {
-    setLeds(0,0,1, 0,0,1); delay(100);
-    setLeds(0,0,0, 0,0,0); delay(100);
+    setLeds(0,0,1, 0,0,1); delay(250);
+    setLeds(0,0,0, 0,0,0); delay(250);
   }
   applyState('I');
 }
@@ -143,25 +170,44 @@ void loop() {
     if ((now - debounceTimer[i]) >= DEBOUNCE_MS && raw != stableBtn[i]) {
       stableBtn[i] = raw;
       if (raw == LOW) {                    // 按下
-        Keyboard.sendCombo(BTN_KEYS[i]);
+        if (BTN_MACROS[i][0] != '\0') {
+          Keyboard.typeString(BTN_MACROS[i]);
+        } else {
+          Keyboard.sendCombo(BTN_KEYS[i]);
+        }
       } else {                             // 放開
         Keyboard.releaseAll();
       }
     }
   }
 
-  // 處理旋鈕（加入最小間隔防止連觸）
-  bool clk = digitalRead(ENC_CLK);
-  if (clk != lastClk && (now - encTimer) >= ENC_DEBOUNCE_MS) {
-    if (digitalRead(ENC_DT) != clk) {
-      uint8_t up[3] = {KEY_UP_ARROW, 0, 0};
-      Keyboard.sendCombo(up);
-    } else {
-      uint8_t dn[3] = {KEY_DOWN_ARROW, 0, 0};
-      Keyboard.sendCombo(dn);
+  // 處理旋鈕（正交狀態機 + 穩定時間 debounce）
+  uint8_t rawEnc = (digitalRead(ENC_CLK) << 1) | digitalRead(ENC_DT);
+
+  if (rawEnc != encState) {
+    if (rawEnc != encPending) {
+      encPending = rawEnc;
+      encStableTimer = now;
     }
-    Keyboard.releaseAll();
-    encTimer = now;
+
+    if ((now - encStableTimer) >= ENC_STABLE_MS) {
+      int8_t movement = ENC_TABLE[encState][encPending];
+      if (movement != 0) {
+        encCount += movement;
+      }
+      encState = encPending;
+
+      if (encCount >= STEPS_PER_DETENT) {
+        uint8_t up[3] = {UP, 0, 0};
+        Keyboard.sendCombo(up);
+        Keyboard.releaseAll();
+        encCount = 0;
+      } else if (encCount <= -STEPS_PER_DETENT) {
+        uint8_t dn[3] = {DOWN, 0, 0};
+        Keyboard.sendCombo(dn);
+        Keyboard.releaseAll();
+        encCount = 0;
+      }
+    }
   }
-  lastClk = clk;
 }
