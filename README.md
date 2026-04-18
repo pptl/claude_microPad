@@ -63,7 +63,7 @@
 | GP13 | LED1 G（左眼）|
 | GP14 | LED1 B（左眼）|
 | GP16 | LED2 R（右眼）|
-| GP17 | LED2 G（右眼）|
+| GP17 | LED2 G（02  200600右眼）|
 | GP18 | LED2 B（右眼）|
 
 ### LED 接線（共陽極）
@@ -113,12 +113,11 @@ https://github.com/earlephilhower/arduino-pico/releases/download/global/package_
 ```
 
 **Tools 設定：**
-- Board：`Generic RP2040`
+- Board：`Resberry Pi Pico`
 - USB Stack：`Adafruit TinyUSB`
 
 **需安裝 Library：**
 - `Adafruit TinyUSB Library`
-- `Keyboard`（by Arduino）
 
 韌體檔案：`firmware/claude_macropad/claude_macropad.ino`
 
@@ -133,7 +132,7 @@ pip install pyserial
 
 修改 `hooks/led_hook.py` 第 16 行，填入 RP2040 在裝置管理員中的 COM port：
 ```python
-PORT = "COM3"  # 依實際裝置調整
+PORT = "COM4"  # 依實際裝置調整
 ```
 
 ### Claude Code Hooks 設定
