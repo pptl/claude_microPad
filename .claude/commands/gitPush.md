@@ -1,81 +1,118 @@
-自動總結本專案的 git 變更、列出清單，並在用戶確認後 push 到遠端。
+依照以下 SOP 執行 gitPush 流程，將本地 commit 推送至遠端。
 
-執行以下步驟：
+---
 
-## 步驟 1 — 收集變更資訊
+## 第一階段：預檢機制
 
-先用 Bash 執行 `pwd` 取得目前專案目錄路徑，之後所有指令皆在該目錄下執行。
+用 Bash **平行**執行以下指令：
 
-用 Bash 工具**平行**執行以下指令：
+- `git status --porcelain` — 偵測未提交的變更
+- `git branch --show-current` — 取得目前分支名稱
+- `git config user.name` 與 `git config user.email` — Git 帳號身份
+- `git log --oneline -5` — 取得 commit 訊息風格供後續摘要參考
+- `git rev-parse --abbrev-ref @{u} 2>/dev/null || echo "NO_UPSTREAM"` — 偵測是否有遠端追蹤分支
 
-- `git status` — 取得所有未提交的變更
-- `git diff HEAD` — 取得完整 diff（含已 staged 與未 staged）
-- `git log --oneline -5` — 取得最近 5 筆 commit，了解此 repo 的 commit 訊息風格
-- `git stash list` — 確認是否有 stash
+**若 git status --porcelain 輸出不為空，立即中斷：**
 
-## 步驟 2 — 分析並整理變更
+> **[系統提示] 檢測到工作區仍有未提交的變更 (Uncommitted changes detected)。**
+> 為了維護版本紀錄的嚴謹性，請先完成 `commit` 提交或使用 `git stash` 暫存變更後，再執行 `gitPush` 流程。
 
-根據 diff 和 status，產出一份**繁體中文**的變更摘要，格式如下：
+**若偵測結果為 `NO_UPSTREAM`（首次推送新分支），跳至「首次推送流程」。**
+
+---
+
+## 第二階段：狀態彙整與環境資訊
+
+顯示以下資訊供用戶核對：
 
 ```
-📦 變更摘要
+👤 Git 帳號：<user.name> (<user.email>)
+🌿 目前分支：<branch-name>
+```
 
-**已修改的檔案：**
-- `path/to/file` — 一句話說明這個檔案改了什麼、為什麼
+執行 `git log --oneline @{u}..HEAD` 列出所有待推送的 Commit。
 
-**新增的檔案：**
-- `path/to/file` — 說明用途
+若目前分支為 `main` 或 `master`，額外顯示：
 
-**刪除的檔案：**
-- `path/to/file` — 說明原因
+> **[警告] 您目前正在保護分支操作，請再次確認後繼續。**
 
-**建議的 commit 訊息：**
-`<type>: <簡短描述（英文）>`
+---
 
-詳細說明（如有必要）：
+## 第三階段：合併策略與摘要生成
+
+根據待推送的 Commit 標題（不檢索 diff）生成建議摘要，**風格須參考第一階段取得的 `git log` 慣例**（`feat:` / `fix:` / 中文等）。
+
+顯示格式如下：
+
+```
+[推送準備] 偵測到 N 個待推送的 Commit：
+- `<commit 1>`
+- `<commit 2>`
 - ...
+
+建議的綜合提交訊息 (Combined Message)：
+`<綜合後的訊息>`
+
+請確認操作：
+1. 確認並合併推送（預設）
+2. 編輯訊息後推送
+3. 不合併，直接按原樣推送
 ```
 
-- commit 訊息**用英文**，格式遵循此 repo 慣例（`feat:` / `fix:` / `chore:` 等）
-- 每個檔案的說明**用繁體中文**，聚焦在「改了什麼、為什麼」
+若只有 1 個待推送的 Commit，跳過合併，直接詢問是否確認推送（不顯示選項 1/2）。
 
-## 步驟 3 — 詢問確認
+**收到用戶確認之前，不可執行任何 git 寫入操作。**
 
-顯示完整摘要前，先用 Bash 執行以下指令取得目前 git 帳號資訊：
+---
 
-- `git config user.name` — 取得使用者名稱
-- `git config user.email` — 取得使用者 Email
+## 第四階段：執行與結果回饋
 
-在摘要最後顯示：
+### 選項 1 / 2（合併推送）
+
+執行前顯示不可逆警告：
+
+> **[警告] Squash 操作將以單一 Commit 取代目前的 N 個 Commit，此操作在推送後無法還原。**
+> 已自動建立備份分支：`backup/<branch>-<YYYYMMDD>`，可隨時用於復原。
+
+執行步驟：
+1. `git branch backup/<branch>-<YYYYMMDD>` — 建立備份分支
+2. `git merge-base HEAD @{u}` — 找出遠端基準點 hash
+3. `git reset --soft <基準點 hash>` — 將所有 commit 壓回暫存區
+4. 用 HEREDOC 格式執行 `git commit -m "<綜合訊息>"`（不加 Co-Authored-By）
+5. `git push`
+
+若 `git push` 失敗，立即提示：
+
+> **[警告] 推送失敗，您的原始 Commit 已保存於備份分支 `backup/<branch>-<YYYYMMDD>`。**
+> 執行 `git reset --hard backup/<branch>-<YYYYMMDD>` 可完整復原。
+
+### 選項 3（原樣推送）
+
+直接執行 `git push`。
+
+成功後回報：
+
+> **[成功] 已將更新推送至遠端分支 [分支名稱]。**
+
+---
+
+## 首次推送流程（NO_UPSTREAM）
+
+偵測到分支尚未設定遠端追蹤時，顯示：
 
 ```
-👤 目前 Git 帳號：<user.name> (<user.email>)
+[首次推送] 此分支尚未設定遠端追蹤分支。
+將執行：git push -u origin <branch>
+
+確認推送？（Y / N）
 ```
 
-然後問用戶：
+收到確認後，執行 `git push -u origin <branch>`，**跳過合併策略（不執行 Squash）**。
 
-> 「以上是本次的變更摘要。確認要 commit 並 push 嗎？可直接回覆「確認」，或告訴我要修改 commit 訊息。」
+---
 
-**收到確認之前，不可執行任何 git 寫入操作。**
+## 異常處理
 
-## 步驟 4 — 執行 commit 與 push（只在用戶確認後）
-
-1. `git add` 所有相關變更的檔案（**不用** `git add -A`，逐一列出檔案以避免加入敏感檔）
-2. 用 HEREDOC 格式執行 `git commit -m`，commit 訊息結尾附上：
-   ```
-   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-   ```
-3. `git push origin main`
-4. 回報 push 成功，並顯示最新的 commit hash
-
-## 步驟 5 — 例外處理
-
-- **沒有任何變更**：告知用戶「目前沒有未提交的變更，工作目錄是乾淨的。」
-- **有 untracked 的敏感檔案**（`.env`、`*secret*`、`*credential*`）：警告用戶，不將其加入 commit
-- **push 失敗**：顯示錯誤訊息，建議用戶先執行 `git pull --rebase` 解決衝突
-
-## 注意事項
-
-- **永遠不要** force push（`--force`）
-- **永遠不要** 跳過 hooks（`--no-verify`）
-- 若 commit 訊息由用戶提供，使用用戶的版本，不要自行修改
+- **推送被拒絕 (rejected)：** 提示「遠端倉庫有更新，請先執行 `git pull` 進行同步」
+- **沒有待推送的 Commit：** 告知「目前沒有領先遠端的 Commit，無需推送。」
+- **永遠不要** 跳過 hooks（`--no-verify`）或使用 `--force`，除非用戶明確要求

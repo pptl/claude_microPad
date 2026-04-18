@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebSearch",
-      "Bash(python -c \"import serial; s=serial.Serial\\('COM4', 9600, timeout=1\\); s.write\\(b'T'\\); print\\('Sent T - Thinking \\(blue\\)'\\); import time; time.sleep\\(3\\); s.write\\(b'I'\\); print\\('Sent I - Idle \\(green\\)'\\); s.close\\(\\)\")"
-    ]
-  }
-}

@@ -18,11 +18,11 @@ This is a **hardware design project** for the "Claude Ghost Macro Pad" (V2.0 Rel
 **Controller:** YD-RP2040 (Raspberry Pi Pico-compatible, USB Type-C)
 
 **Key Layout (all 1U keycaps):**
-- Top-left standalone: `Terminate` (Ctrl+C)
-- Top-right standalone: `Knob / ESC` (rotary encoder — scroll or press to escape)
+- Top-left standalone: `ESC` (ESC)
+- Top-right standalone: `Knob / gitPush` (rotary encoder — scroll or press to run /gitPush)
 - Central 2×4 matrix:
-  - Upper row: `Change Permission Mode` | `Explain` (Ctrl+E) | `UP` | `Enter`
-  - Lower row: `Show Todo` (Ctrl+T) | `/` (Slash Command) | `DOWN` | `Switch Window` (Win+Tab)
+  - Upper row: `/` (Slash Command) | `Change Permission Mode` (Shift+Tab) | `Switch Window` (Win+Tab) | `Enter`
+  - Lower row: `Git Commit` (/gitCommit + Enter) | `Clear` (/clear + Enter) | `Compact` (/compact + Enter) | `Allow` (allow + Enter)
 
 **LED (RGB, common-anode):** Longest pin → 3.3V; R/G/B pins each through 220Ω resistor to GPIO. Logic: `False` (LOW) = on, `True` (HIGH) = off.
 

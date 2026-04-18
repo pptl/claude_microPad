@@ -2,7 +2,7 @@
 
 這是一台專為 **Claude Code** 開發流程優化的左手專用巨集鍵盤。本版本採用 **雙層透明鍵帽 (Relegendable Keycaps)** 方案，透過紙條替換實現快速客製化，無需轉印與噴漆。
 
-外殼採鬼魂造型，橙色半透明壓克力，正面印有 **ANTHROPIC** 字樣，頂部兩顆 RGB LED 作為「鬼眼」狀態燈。
+外殼採鬼魂造型，橙色半透明壓克力，頂部兩顆 RGB LED 作為「鬼眼」狀態燈。
 
 ---
 
@@ -36,16 +36,16 @@
 
 | 索引 | 位置 | 功能 | 輸出 |
 | :--- | :--- | :--- | :--- |
-| **[8]** | 左上角獨立鍵 | Terminate | Ctrl+C |
-| **[9]** | 右上角旋鈕按下 | ESC | ESC |
+| **[8]** | 左上角獨立鍵 | ESC | ESC |
+| **[9]** | 右上角旋鈕按下 | Git Push | `/gitPush` + Enter |
 | **[0]** | 矩陣上排 1 | Slash Command | `/` |
 | **[1]** | 矩陣上排 2 | Change Permission Mode | Shift+Tab |
 | **[2]** | 矩陣上排 3 | Switch Window | Win+Tab |
 | **[3]** | 矩陣上排 4 | Enter | Enter |
-| **[4]** | 矩陣下排 1 | Git Push | `/gitPush` + Enter |
-| **[5]** | 矩陣下排 2 | 啟動 Claude CLI | `claude` + Enter |
-| **[6]** | 矩陣下排 3 | Clear 對話 | `/clear` + Enter |
-| **[7]** | 矩陣下排 4 | Compact 對話 | `/compact` + Enter |
+| **[4]** | 矩陣下排 1 | Git Commit | `/gitCommit` + Enter |
+| **[5]** | 矩陣下排 2 | Clear 對話 | `/clear` + Enter |
+| **[6]** | 矩陣下排 3 | Compact 對話 | `/compact` + Enter |
+| **[7]** | 矩陣下排 4 | Allow | `allow` + Enter |
 | — | 旋鈕旋轉 | 捲動 | ↑ / ↓ |
 
 ---
@@ -60,7 +60,7 @@
 
 | GPIO | 功能 |
 | :--- | :--- |
-| GP0 | 按鍵 [8] — Terminate (Ctrl+C) |
+| GP0 | 按鍵 [8] — ESC |
 | GP2 | LED1 R（左眼）|
 | GP3 | LED1 G（左眼）|
 | GP4 | LED1 B（左眼）|
@@ -203,10 +203,11 @@ const uint8_t BTN_KEYS[10][3] = {
 
 ```c
 const char* BTN_MACROS[10] = {
-  "",              // [0] 空字串 → 使用 BTN_KEYS
-  "",              // [1] 空字串 → 使用 BTN_KEYS
-  "/gitPush\n\n",  // [4] 輸出 /gitPush 後按兩次 Enter
-  "claude\n\n",    // [5] 輸出 claude 後按兩次 Enter
+  "",               // [0] 空字串 → 使用 BTN_KEYS
+  "",               // [1] 空字串 → 使用 BTN_KEYS
+  "/gitCommit\n\n", // [4] 輸出 /gitCommit 後按兩次 Enter
+  "/clear\n\n",     // [5] 輸出 /clear 後按兩次 Enter
+  "/gitPush\n\n",   // [9] 輸出 /gitPush 後按兩次 Enter（旋鈕）
   ...
 };
 ```
