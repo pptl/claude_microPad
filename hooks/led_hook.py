@@ -16,7 +16,7 @@ Setup:
 import sys
 import json
 
-PORT = "COM4"   # <-- Change this to match your RP2040's CDC serial port
+PORT = "COM8"   # <-- Change this to match your RP2040's CDC serial port
 BAUD = 9600
 
 EVENT_MAP = {

@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
   <diagram name="第 1 页" id="VRUSpOt8zUIQcrTUgfkp">
-    <mxGraphModel dx="2002" dy="688" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2253" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -43,16 +43,16 @@
         <mxCell id="8eWIT58y5PIdA9ABZQ03-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="switch Window&lt;br&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;（win+tab）&lt;/span&gt;" vertex="1">
           <mxGeometry height="180" width="180" x="450" y="1025" as="geometry" />
         </mxCell>
-        <mxCell id="8eWIT58y5PIdA9ABZQ03-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="/" vertex="1">
+        <mxCell id="8eWIT58y5PIdA9ABZQ03-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&quot;/clear&quot;+enter" vertex="1">
           <mxGeometry height="180" width="180" x="40" y="1020" as="geometry" />
         </mxCell>
-        <mxCell id="8eWIT58y5PIdA9ABZQ03-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&quot;/clear&quot;+enter" vertex="1">
+        <mxCell id="8eWIT58y5PIdA9ABZQ03-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&quot;/gitPush&quot;+enter" vertex="1">
           <mxGeometry height="180" width="180" x="250" y="1220" as="geometry" />
         </mxCell>
-        <mxCell id="8eWIT58y5PIdA9ABZQ03-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&quot;/compact&quot;+enter" vertex="1">
+        <mxCell id="8eWIT58y5PIdA9ABZQ03-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="change Premission Mode&lt;div&gt;(Shift+Tab)&lt;/div&gt;" vertex="1">
           <mxGeometry height="180" width="180" x="450" y="1220" as="geometry" />
         </mxCell>
-        <mxCell id="8eWIT58y5PIdA9ABZQ03-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="change Premission Mode&lt;div&gt;(Shift+Tab)&lt;/div&gt;" vertex="1">
+        <mxCell id="8eWIT58y5PIdA9ABZQ03-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&quot;/compact&quot;+enter" vertex="1">
           <mxGeometry height="180" width="180" x="250" y="1025" as="geometry" />
         </mxCell>
         <mxCell id="8eWIT58y5PIdA9ABZQ03-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="enter" vertex="1">
@@ -67,7 +67,7 @@
         <mxCell id="8eWIT58y5PIdA9ABZQ03-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;ESC&lt;/div&gt;" vertex="1">
           <mxGeometry height="180" width="180" x="-150" y="810" as="geometry" />
         </mxCell>
-        <mxCell id="8eWIT58y5PIdA9ABZQ03-13" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" value="&quot;/gitPush&quot;+enter" vertex="1">
+        <mxCell id="8eWIT58y5PIdA9ABZQ03-13" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" value="enter" vertex="1">
           <mxGeometry height="185" width="185" x="870" y="800" as="geometry" />
         </mxCell>
         <mxCell id="1l01UbEAeyTldkkzhndM-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Knob" vertex="1">

@@ -147,29 +147,54 @@ pip install pyserial
 
 ### 步驟三：設定 COM Port
 
-1. 插上 Macro Pad，開啟 **裝置管理員 → 連接埠 (COM 和 LPT)**，找到 RP2040 對應的 COM 編號（例如 COM4）
+1. 插上 Macro Pad，開啟 **裝置管理員 → 連接埠 (COM 和 LPT)**，找到 RP2040 對應的 COM 編號
 
-2. 修改 `hooks/led_hook.py` 第 19 行：
+   > **快速辨識方法：** 在 Python 執行以下指令，找到 VID `0x239A`（Adafruit）的裝置即是 RP2040：
+   > ```python
+   > import serial.tools.list_ports
+   > for p in serial.tools.list_ports.comports():
+   >     print(p.device, hex(p.vid) if p.vid else "N/A", p.description)
+   > ```
+
+2. 修改 `hooks/led_hook.py` 第 19 行，填入實際 COM 編號：
    ```python
-   PORT = "COM4"  # 依實際裝置調整
+   PORT = "COM8"  # 依實際裝置調整
    ```
 
 ### 步驟四：設定 Claude Code Hooks
 
-將以下內容加入 `~/.claude/settings.json`（注意路徑改為本機實際路徑）：
+`led_hook.py` **沒有固定存放路徑**，可以放在任何位置，但必須確保 `~/.claude/settings.json` 裡的路徑與實際位置一致。
+
+將以下內容加入 `~/.claude/settings.json`。`led_hook.py` 建議存放至全域 `~/.claude/scripts/` 資料夾，路徑需與本機使用者名稱一致（將 `USER_NAME` 替換為自己的帳號名稱）：
 
 ```json
 {
   "hooks": {
-    "PreToolUse":         [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}],
-    "PostToolUse":        [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}],
-    "Stop":               [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}],
-    "PostToolUseFailure": [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}],
-    "StopFailure":        [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}],
-    "PermissionDenied":   [{"matcher": "", "hooks": [{"type": "command", "command": "python d:\\projects\\claude_microPad\\hooks\\led_hook.py"}]}]
+    "UserPromptSubmit":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PreToolUse":         [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PostToolUse":        [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "Stop":               [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PostToolUseFailure": [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "StopFailure":        [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PermissionDenied":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}]
   }
 }
 ```
+
+> **注意：** Windows 使用 `py` 啟動器（上方範例），macOS / Linux 改用 `python3`。若移動了 `led_hook.py`，記得同步更新 settings.json 裡的路徑。
+
+#### 偵錯：確認 Hook 是否正常運作
+
+Hook 執行時會將收到的事件記錄至 `hooks/debug.log`。若 LED 無反應，可查看此檔案確認 Hook 是否有被觸發：
+
+```bash
+# 查看最後 10 筆事件
+tail -10 d:/projects/claude_microPad/hooks/debug.log   # 原始專案路徑
+# 或（若已移至全域）
+tail -10 "C:/Users/USER_NAME/.claude/scripts/debug.log"
+```
+
+若 log 有內容但 LED 仍無反應，通常是 COM Port 設定錯誤或裝置未連接。
 
 ---
 
