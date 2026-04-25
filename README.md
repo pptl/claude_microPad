@@ -117,10 +117,11 @@
 
 | 狀態 | 顏色 | 說明 |
 | :--- | :--- | :--- |
-| Idle（待機）| 🟢 綠色 | 開機預設，無操作 |
+| Idle（待機）| 🟢 綠色 | 開機預設、無操作、任務被使用者中斷（ESC）或拒絕授權 |
 | Thinking（思考中）| 🔵 藍色 | Claude 正在執行工具 |
-| Completed（完成）| 🟢 綠色 | 任務完成或回覆結束 |
-| Error（問題）| 🔴 紅色 | 工具失敗、權限拒絕、API 錯誤 |
+| Completed（完成）| 🟢 綠色 | 任務完成、回覆結束或 `/compact` 壓縮完畢 |
+| Waiting（等待授權）| 🔴 紅色 | 等待使用者批准工具使用請求（PermissionRequest）|
+| Error（問題）| 🔴 紅色 | 工具失敗、API 錯誤 |
 
 ---
 
@@ -187,8 +188,9 @@ pip install pyserial
     "PostToolUseFailure": [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
     "StopFailure":        [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
     "PermissionDenied":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
-    "Notification":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
-    "PermissionRequest":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}]
+    "Notification":       [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PermissionRequest":  [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PostCompact":        [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}]
   }
 }
 ```
