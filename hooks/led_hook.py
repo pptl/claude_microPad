@@ -6,7 +6,8 @@ to the RP2040 macro pad via USB CDC serial.
 Commands:
   T = Thinking  (UserPromptSubmit, PreToolUse, PostToolUse)
   C = Completed (Stop with reason=completed)
-  E = Error     (PostToolUseFailure, StopFailure, PermissionDenied, permission_prompt)
+  I = Idle      (user_interrupt, PermissionDenied)
+  E = Error     (PostToolUseFailure, StopFailure, PermissionRequest, permission_prompt)
 
 Setup:
   pip install pyserial
@@ -26,7 +27,9 @@ EVENT_MAP = {
     "Stop":                "C",   # refined below for stop_reason
     "PostToolUseFailure":  "E",
     "StopFailure":         "E",
-    "PermissionDenied":    "E",
+    "PermissionRequest":   "E",   # waiting for user approval → red
+    "PermissionDenied":    "I",   # task terminated → idle green
+    "PostCompact":         "C",   # compact finished → green
 }
 
 LOG = "d:/projects/claude_microPad/hooks/debug.log"
@@ -64,6 +67,12 @@ def main():
 
     if cmd is None:
         sys.exit(0)
+
+    # Stop/PermissionDenied may race with in-flight T commands from parallel hooks.
+    # A short delay lets them finish writing first so this green command wins.
+    if event in ("Stop", "PermissionDenied", "StopFailure"):
+        import time
+        time.sleep(0.35)
 
     try:
         import serial

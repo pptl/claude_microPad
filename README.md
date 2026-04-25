@@ -2,9 +2,16 @@
 
 這是一台專為 **Claude Code** 開發流程優化的左手專用巨集鍵盤。本版本採用 **雙層透明鍵帽 (Relegendable Keycaps)** 方案，透過紙條替換實現快速客製化，無需轉印與噴漆。
 
-外殼採鬼魂造型，橙色3D列印外殼，頂部兩顆 RGB LED 作為「鬼眼」狀態燈。
+外殼採鬼魂造型，橙色3D列印外殼，頂部兩顆 RGB LED 作為「鬼眼」狀態燈。閑置時會顯示綠色，思考時會顯示藍色，等待使用者確認權限時會顯示紅色。
 
-![成品展示](成品展示_gif.gif)
+![成品展示](media/成品展示_gif.gif)
+
+### LED 狀態展示
+
+| 待機（Idle）| 思考中（Thinking）| 等待授權（Permission Request）|
+| :---: | :---: | :---: |
+| ![待機](media/idle.jpg) | ![思考中](media/thinking.jpg) | ![等待授權](media/waitingForPermission.jpg) |
+| 🟢 綠色 — 無操作 | 🔵 藍色 — Claude 執行工具中 | 🔴 紅色 — 等待使用者確認 |
 
 ---
 
@@ -293,8 +300,17 @@ claude_microPad/
 ├── CLAUDE.md                          # Claude Code 專案指引
 ├── diagram.json                       # Wokwi 電路模擬圖
 ├── 按鈕佈局.drawio                     # 按鍵佈局設計圖（Draw.io）
-├── 按鈕佈局.jpg                        # 按鍵佈局匯出圖
 ├── Keycap_Labels_Print.pdf            # 🖨️ 鍵帽標籤列印檔（直接列印、裁切即可使用）
+├── media/                             # 圖片、影片、GIF 媒體素材
+│   ├── 按鈕佈局.jpg                   # 按鍵佈局匯出圖
+│   ├── 成品展示_gif.gif               # 成品展示動圖
+│   ├── 成品展示_pic.jpg               # 成品展示靜態圖
+│   ├── fidgetToy.gif                  # 解壓玩具展示動圖
+│   ├── demo.mp4                       # 成品展示影片
+│   ├── idle.jpg                       # LED 狀態：待機
+│   ├── thinking.jpg                   # LED 狀態：思考中
+│   ├── waitingForPermission.jpg       # LED 狀態：等待授權
+│   └── Gemini_Generated_Image_uxtut7uxtut7uxtu.png
 ├── firmware/
 │   └── claude_macropad/
 │       ├── claude_macropad.ino        # Arduino 韌體主程式（勿需修改）
@@ -430,7 +446,7 @@ cp /path/to/claude_microPad/.claude/commands/gitPush.md ~/.claude/commands/gitPu
 
 本專案附帶一款以 Claude Code 吉祥物為外形設計的解壓小玩具（Fidget Toy），可自行 3D 列印。
 
-![解壓玩具展示](fidgetToy.gif)
+![解壓玩具展示](media/fidgetToy.gif)
 
 **模型下載：** [MyMiniFactory — Claude Code Mascot Fidget Toy](https://www.myminifactory.com/object/3d-print-claude-code-mascot-fidget-toy-791307)
 
