@@ -179,7 +179,9 @@ pip install pyserial
     "Stop":               [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
     "PostToolUseFailure": [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
     "StopFailure":        [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
-    "PermissionDenied":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}]
+    "PermissionDenied":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "Notification":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}],
+    "PermissionRequest":   [{"matcher": "", "hooks": [{"type": "command", "command": "py C:\\Users\\USER_NAME\\.claude\\scripts\\led_hook.py"}]}]
   }
 }
 ```
@@ -424,4 +426,14 @@ cp /path/to/claude_microPad/.claude/commands/gitPush.md ~/.claude/commands/gitPu
 
 ---
 
-*文件更新日期：2026-04-19*
+## 🧸 十二、 Claude Code 吉祥物解壓小玩具
+
+本專案附帶一款以 Claude Code 吉祥物為外形設計的解壓小玩具（Fidget Toy），可自行 3D 列印。
+
+![解壓玩具展示](fidgetToy.gif)
+
+**模型下載：** [MyMiniFactory — Claude Code Mascot Fidget Toy](https://www.myminifactory.com/object/3d-print-claude-code-mascot-fidget-toy-791307)
+
+---
+
+*文件更新日期：2026-04-25*
